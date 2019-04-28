@@ -1,0 +1,21 @@
+#!/usr/bin/expect
+set ipaddr [lindex $argv 0]
+set username [lindex $argv 1]
+set userpasswd [lindex $argv 2]
+set rootpasswd [lindex $argv 3]
+set timeout 10
+spawn ssh $username@$ipaddr
+  expect {
+  "yse/no" {send "yes\r";exp_continue}
+  "*password*" {send "$userpasswd\r";exp_continue}
+  "*from*" {send "su - root\r"}
+}
+expect "Password"
+send "$rootpasswd\r"
+expect "*]#"
+send "chmod 777 /tmp/buying_linuxcheck.sh\r"
+send "sh /tmp/buying_linuxcheck.sh\r"
+send "exit\r"
+send "exit\r"
+interact 
+

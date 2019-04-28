@@ -1,0 +1,10 @@
+#!/usr/bin/expect
+set ipadd [lindex $argv 0]
+set username [lindex $argv 1]
+set userpasswd [lindex $argv 2]
+set timeout 10
+spawn scp $username@$ipadd:/tmp/*${ipadd}* /tmp/
+expect {
+  "password" {send "$userpasswd\r"}
+}
+expect eof

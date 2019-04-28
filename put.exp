@@ -1,0 +1,11 @@
+#!/usr/bin/expect
+set ipadd [lindex $argv 0]
+set username [lindex $argv 1]
+set userpasswd [lindex $argv 2]
+set timeout 10
+spawn scp buying_linuxcheck.sh $username@$ipadd:/tmp/
+expect {
+  "yes/no" {send "yes\r";exp_continue}
+  "password" {send "$userpasswd\r"}
+}
+expect eof
