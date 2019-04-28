@@ -12,3 +12,4 @@ expect {
   "*]#" {send "rm -rf /tmp/*${ipadd}* /tmp/buying_linuxcheck.sh\r"}
 }
 expect eof
+ 
