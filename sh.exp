@@ -18,4 +18,3 @@ send "sh /tmp/buying_linuxcheck.sh\r"
 send "exit\r"
 send "exit\r"
 interact 
-
