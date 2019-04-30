@@ -1188,7 +1188,7 @@ echo ------------14.2 恶意文件---------------------
 
 echo ------------14.3 最近24小时内变动的文件---------------------
 #查看最近24小时内有改变的文件
-(find / -mtime 0 | grep -E "\.(py|sh|per|pl|php|asp|jsp)$" | tee -a $danger_file | $saveresult
+(find / -mtime 0 | grep -E "\.(py|sh|per|pl|php|asp|jsp)$"） | tee -a $danger_file | $saveresult
 printf "\n" | $saveresult
 
 
