@@ -5,7 +5,6 @@ echo "Author:飞鸟"
 echo "Mail:liuquyong112@gmail.com"
 echo "Date:2019-02-19"
 
-
 cat <<EOF
 *********************************************
 Linux主机安全检查:
