@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "安徽三实捕影Linux安全检查与应急响应工具"
-echo "Version:1.2"
+echo "Version:1.3"
 echo "Author:飞鸟"
 echo "Mail:liuquyong112@gmail.com"
 echo "Date:2019-02-19"
@@ -184,6 +184,7 @@ Linux主机安全检查:
 			20.4.1 并发连接
 		20.5 其他
 			20.5.1 运行时间及负载情况
+	21.共享情况
 
 
 *********************************************
@@ -321,12 +322,13 @@ count=0
 if [ -n "$tcpport" ];then
 	for port in $tcpport
 	do
-		for i in `cat checkrules/dangerstcpports.dat`
+		for i in `cat /tmp/dangerstcpports.dat`
 		do
 			tcpport=`echo $i | awk -F "[:]" '{print $1}'`
 			desc=`echo $i | awk -F "[:]" '{print $2}'`
+			process=`echo $i | awk -F "[:]" '{print $3}'`
 			if [ $tcpport == $port ];then
-				echo "$tcpport,$desc" | tee -a $danger_file | $saveresult
+				echo "$tcpport,$desc,$process" | tee -a $danger_file | $saveresult
 				count=count+1
 			fi
 		done
@@ -335,7 +337,7 @@ fi
 if [ $count = 0 ];then
 	echo "[*]未发现TCP危险端口" | $saveresult
 else
-	echo "[!!!]请人工对TCP危险端口进行关联分析与确认"
+	echo "[!!!]请人工对TCP危险端口进行关联分析与确认" | $saveresult
 fi
 printf "\n" | $saveresult
 
@@ -346,12 +348,13 @@ count=0
 if [ -n "$udpport" ];then
 	for port in $udpport
 	do
-		for i in `cat checkrules/dangersudpports.dat`
+		for i in `cat /tmp/dangersudpports.dat`
 		do
 			udpport=`echo $i | awk -F "[:]" '{print $1}'`
 			desc=`echo $i | awk -F "[:]" '{print $2}'`
+			process=`echo $i | awk -F "[:]" '{print $3}'`
 			if [ $udpport == $port ];then
-				echo "$udpport,$desc" | tee -a $danger_file | $saveresult
+				echo "$udpport,$desc,$process" | tee -a $danger_file | $saveresult
 				count=count+1
 			fi
 		done
@@ -1187,7 +1190,7 @@ echo ------------14.2 恶意文件---------------------
 
 echo ------------14.3 最近24小时内变动的文件---------------------
 #查看最近24小时内有改变的文件
-(find / -mtime 0 | grep -E "\.(py|sh|per|pl|php|asp|jsp)$"） | tee -a $danger_file | $saveresult
+(find / -mtime 0 | grep -E "\.(py|sh|per|pl|php|asp|jsp)$") | tee -a $danger_file | $saveresult
 printf "\n" | $saveresult
 
 
@@ -1791,6 +1794,18 @@ echo ------------20.5.1 运行时间及负载-----------------
 echo "[20.5.1]正在检查系统运行时间及负载情况......" | $saveresult
 (echo "[*]系统运行时间如下:" && uptime) | $saveresult
 printf "\n" | $saveresult
+
+
+echo ------------21 共享情况----------------------
+echo "[21]正在检查共享情况......" | $saveresult
+share=$(exportfs)
+if [ -n "$share" ];then
+	(echo "[!!!]网络共享情况如下:" && echo "$share") | $saveresult
+else
+	echo "[*]未发现网络共享" | $saveresult
+fi
+printf "\n" | $saveresult
+
 
 echo "[*]正在将检查文件压缩到/tmp/目录下......"
 zip -r /tmp/buying_${ipadd}_${date}.zip /tmp/buying_${ipadd}_${date}/*
