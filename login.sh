@@ -37,4 +37,4 @@ do
   expect get.exp $ipadd $port $username $userpasswd 
   #删除远程服务器的检查结果和检查脚本
   expect del.exp $ipadd $port $username $userpasswd $rootpasswd
-done
+done 
