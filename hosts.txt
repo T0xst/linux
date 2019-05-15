@@ -1,1 +1,1 @@
-192.168.78.129:user:userpasswod:rootpassword
+192.168.78.129:22:user:userpasswod:rootpassword
