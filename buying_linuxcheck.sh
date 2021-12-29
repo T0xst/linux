@@ -1,30 +1,32 @@
 #!/bin/bash
-echo "安徽三实捕影Linux安全检查与应急响应工具"
-echo "Version:1.3"
+echo "Version:1.2"
 echo "Author:飞鸟"
 echo "Mail:liuquyong112@gmail.com"
-echo "Date:2019-02-19"
+echo "2019-02-19 创建 V1.0"
+echo "2019-05-09 更新 V1.1"
+echo "2019-07-29 更新 V1.2"
 
 cat <<EOF
 *********************************************
 Linux主机安全检查:
-	1.首先采集原始信息保存到/tmp/buying_${ipadd}_${date}/check_file/文件夹下
-	2.将系统日志、应用日志打包并保存到/tmp/buying_${ipadd}_${date}/log/目录下
-	3.在检查过程中若发现存在问题则直接输出到/tmp/buying_${ipadd}_${date}/danger_file.txt文件中
+	1.首先采集原始信息保存到/tmp/liuxcheck_${ipadd}_${date}/check_file/文件夹下
+	2.将系统日志、应用日志打包并保存到/tmp/linuxcheck_${ipadd}_${date}/log/目录下
+	3.在检查过程中若发现存在问题则直接输出到/tmp/linuxcheck_${ipadd}_${date}/danger_file.txt文件中
 	4.有些未检查可能存在问题的需要人工分析原始文件
 	5.脚本编写环境Centos7,在实际使用过程中若发现问题可以邮件联系:liuquyong112@gmail.com
 	6.使用过程中若在windows下修改再同步到Linux下，请使用dos2unix工具进行格式转换,不然可能会报错
 	7.在使用过程中必须使用root账号,不然可能导致某些项无法分析
 
 如何使用:
-	1.本脚本可以单独运行,单独运行中只需要将本脚本上传到相应的服务器中,然后sh buying_linuxcheck.sh即可
+	1.本脚本可以单独运行,单独运行中只需要将本脚本上传到相应的服务器中,然后sh linuxcheck.sh即可
 	2.另外本脚本可以作为多台服务器全面检查的安全检查模板,本脚本不需要手工运行,只需要将相应服务器的IP、账号、密码写到hosts.txt文件中，然后sh login.sh即可
 
 功能设计:
 	1.V1.0主要功能用来采集信息
 	2.V1.1主要功能将原始数据进行分析,并找出存在可疑或危险项
 	3.V1.2增加基线检查的功能
-	4.V1.3可以进行相关危险项或可疑项的自动处理
+	4.V1.3对收集过来的信息,如网络连接的IP、定时任务的URL、自启动文件、关键文件的MD5通过第三方的威胁情报接口进行查询并返回相应的结果
+	5.V1.4可以进行相关危险项或可疑项的自动处理
 
 
 检查内容
@@ -42,6 +44,7 @@ Linux主机安全检查:
 			1.1.2 UDP开放端口
 		1.2 TCP高危端口
 		1.3 UDP高危端口
+		1.4 端口转发
 	2.网络连接
 	3.网卡模式
 	4.自启动项
@@ -135,7 +138,7 @@ Linux主机安全检查:
 	16.系统日志分析
 		16.1 日志配置与打包
 			16.1.1 查看日志配置
-			16.1.2日志是否存在
+			16.1.2 日志是否存在
 			16.1.3 日志审核是否开启
 			16.1.4 自动打包日志
 		16.2 secure日志分析
@@ -184,24 +187,23 @@ Linux主机安全检查:
 			20.4.1 并发连接
 		20.5 其他
 			20.5.1 运行时间及负载情况
-	21.共享情况
 
 
 *********************************************
 EOF
 
-dos2unix buying.sh
+dos2unix linuxcheck.sh
 date=$(date +%Y%m%d)
 
 ipadd=$(ifconfig -a | grep -w inet | grep -v 127.0.0.1 | awk 'NR==1{print $2}')
 
-check_file="/tmp/buying_${ipadd}_${date}/check_file/"
-danger_file="/tmp/buying_${ipadd}_${date}/danger_file.txt"
-log_file="/tmp/buying_${ipadd}_${date}/log/"
+check_file="/tmp/linuxcheck_${ipadd}_${date}/check_file/"
+danger_file="/tmp/linuxcheck_${ipadd}_${date}/danger_file.txt"
+log_file="/tmp/linuxcheck_${ipadd}_${date}/log/"
 rm -rf $check_file
 rm -rf $danger_file
 rm -rf log_file
-mkdir /tmp/buying_${ipadd}_${date}/
+mkdir /tmp/linuxcheck_${ipadd}_${date}/
 echo "检查发现危险项,请注意:" > ${danger_file}
 mkdir $check_file
 echo "" >> $danger_file
@@ -784,7 +786,7 @@ printf "\n" | $saveresult
 echo ------------11.10.5 securetty文件权限--------------------
 echo "[11.10.5]正在检查securetty文件权限....." | $saveresult
 securetty=$(ls -l /etc/securetty | awk '{print $1}')
-if [ "${securetty:1:9}" = "-rw-------" ]; then
+if [ "${securetty:1:9}" = "rw-------" ]; then
     echo "[*]/etc/securetty文件权限为600,符合规范" | $saveresult
 else
     echo "[!!!]/etc/securetty文件权限为""${securetty:1:9}","不符合规范,权限应改为600" | tee -a $danger_file | $saveresult
@@ -794,7 +796,7 @@ printf "\n" | $saveresult
 echo ------------11.10.6 services文件权限--------------------
 echo "[11.10.6]正在检查services文件权限....." | $saveresult
 services=$(ls -l /etc/services | awk '{print $1}')
-if [ "${services:1:9}" = "-rw-r--r--" ]; then
+if [ "${services:1:9}" = "rw-r--r--" ]; then
     echo "[*]/etc/services文件权限为644,符合规范" | $saveresult
 else
     echo "[!!!]/etc/services文件权限为""$services:1:9}","不符合规范,权限应改为644" | tee -a $danger_file | $saveresult
@@ -804,7 +806,7 @@ printf "\n" | $saveresult
 echo ------------11.10.7 grub.conf文件权限--------------------
 echo "[11.10.7]正在检查grub.conf文件权限....." | $saveresult
 grubconf=$(ls -l /etc/grub.conf | awk '{print $1}')
-if [ "${grubconf:1:9}" = "-rw-------" ]; then
+if [ "${grubconf:1:9}" = "rw-------" ]; then
     echo "[*]/etc/grub.conf文件权限为600,符合规范" | $saveresult
 else
     echo "[!!!]/etc/grub.conf文件权限为""${grubconf:1:9}","不符合规范,权限应改为600" | tee -a $danger_file | $saveresult
@@ -814,7 +816,7 @@ printf "\n" | $saveresult
 echo ------------11.10.8 xinetd.conf文件权限--------------------
 echo "[11.10.8]正在检查xinetd.conf文件权限....." | $saveresult
 xinetdconf=$(ls -l /etc/xinetd.conf | awk '{print $1}')
-if [ "${xinetdconf:1:9}" = "-rw-------" ]; then
+if [ "${xinetdconf:1:9}" = "rw-------" ]; then
     echo "[*]/etc/xinetd.conf文件权限为600,符合规范" | $saveresult
 else
     echo "[!!!]/etc/xinetd.conf文件权限为""${xinetdconf:1:9}","不符合规范,权限应改为600" | tee -a $danger_file | $saveresult
@@ -825,7 +827,7 @@ echo ------------11.10.9 lilo.conf文件权限--------------------
 echo "[11.10.9]正在检查lilo.conf文件权限....." | $saveresult
 if [ -f /etc/lilo.conf ];then
 liloconf=$(ls -l /etc/lilo.conf | awk '{print $1}')
-	if [ "${liloconf:1:9}" = "-rw-------" ];then
+	if [ "${liloconf:1:9}" = "rw-------" ];then
 		echo "/etc/lilo.conf文件权限为600,符合要求" | $saveresult
 	else
 		echo "/etc/lilo.conf文件权限不为600,不符合要求,建议设置权限为600" | $saveresult
@@ -1284,7 +1286,7 @@ echo ------------15.1 系统文件完整性----------------------
 #另一方面,使用该软件进行多次检查时会将相应的MD5值进行对比,若和上次不一样,则会进行提示
 
 echo "[15.1]正在采集系统关键文件MD5....."
-file="/tmp/buying_${ipadd}_${date}/sysfile_md5.txt"
+file="/tmp/linuxcheck_${ipadd}_${date}/sysfile_md5.txt"
 if [ -e "$file" ]; then 
 	md5sum -c "$file" 2>&1; 
 else
@@ -1795,23 +1797,10 @@ echo "[20.5.1]正在检查系统运行时间及负载情况......" | $saveresult
 (echo "[*]系统运行时间如下:" && uptime) | $saveresult
 printf "\n" | $saveresult
 
-
-echo ------------21 共享情况----------------------
-echo "[21]正在检查共享情况......" | $saveresult
-share=$(exportfs)
-if [ -n "$share" ];then
-	(echo "[!!!]网络共享情况如下:" && echo "$share") | $saveresult
-else
-	echo "[*]未发现网络共享" | $saveresult
-fi
-printf "\n" | $saveresult
-
-
 echo "[*]正在将检查文件压缩到/tmp/目录下......"
-zip -r /tmp/buying_${ipadd}_${date}.zip /tmp/buying_${ipadd}_${date}/*
+zip -r /tmp/linuxcheck_${ipadd}_${date}.zip /tmp/linuxcheck_${ipadd}_${date}/*
 
 echo "检查结束！！！"
-echo "安徽三实捕影Linux安全检查与应急响应工具"
 echo "Version:1.2"
 echo "Author:飞鸟"
 echo "若有问题请联系Mail:liuquyong112@gmail.com"
