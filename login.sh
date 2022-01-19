@@ -1,9 +1,8 @@
 #!/bin/bash
-echo "安徽三实捕影Linux安全检查与应急响应工具"
-echo "Version:1.2"
+echo "Version:1.3"
 echo "Author:飞鸟"
 echo "Mail:liuquyong112@gmail.com"
-echo "Date:2019-02-19"
+echo "Date:2022-01-10"
 
 cat <<EOF
 *************************************************************************************
@@ -29,9 +28,9 @@ do
   userpasswd=`echo $i | awk -F "[:]" '{print $4}'`
   #root用户密码
   rootpasswd=`echo $i | awk -F "[:]" '{print $5}'`
-  #上传检查脚本buying_linuxcheck.sh
+  #上传检查脚本linuxcheck.sh
   expect put.exp $ipadd $port $username $userpasswd 
-  #登陆执行检查脚本buying_linuxcheck.sh
+  #登陆执行检查脚本linuxcheck.sh
   expect sh.exp $ipadd $port $username $userpasswd $rootpasswd 
   #从远程拿取结果
   expect get.exp $ipadd $port $username $userpasswd 
