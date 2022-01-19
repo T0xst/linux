@@ -14,8 +14,8 @@ spawn ssh $username@$ipaddr -p $port
 expect "Password"
 send "$rootpasswd\r"
 expect "*]#"
-send "chmod 777 /tmp/buying_linuxcheck.sh\r"
-send "sh /tmp/buying_linuxcheck.sh\r"
+send "chmod 777 /tmp/linuxcheck.sh\r"
+send "sh /tmp/linuxcheck.sh\r"
 send "exit\r"
 send "exit\r"
 interact
