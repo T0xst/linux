@@ -10,7 +10,7 @@ expect {
   "password" {send "$userpasswd\r";exp_continue}
   "*from*" {send "su - root\r";exp_continue}
   "*assword*" {send "$rootpasswd\r";exp_continue}
-  "*]#" {send "rm -rf /tmp/*${ipadd}* /tmp/buying_linuxcheck.sh /tmp/dangerstcpports.dat /tmp/dangersudports.dat\r"}
+  "*]#" {send "rm -rf /tmp/*${ipadd}* /tmp/inuxcheck.sh /tmp/dangerstcpports.dat /tmp/dangersudports.dat\r"}
 }
 expect eof
 
