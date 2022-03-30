@@ -2,9 +2,7 @@
 echo "Version:1.2"
 echo "Author:飞鸟"
 echo "Mail:liuquyong112@gmail.com"
-echo "2019-02-19 创建 V1.0"
-echo "2019-05-09 更新 V1.1"
-echo "2019-07-29 更新 V1.2"
+echo "Date:2019-02-19"
 
 cat <<EOF
 *********************************************
@@ -138,7 +136,7 @@ Linux主机安全检查:
 	16.系统日志分析
 		16.1 日志配置与打包
 			16.1.1 查看日志配置
-			16.1.2 日志是否存在
+			16.1.2日志是否存在
 			16.1.3 日志审核是否开启
 			16.1.4 自动打包日志
 		16.2 secure日志分析
@@ -786,7 +784,7 @@ printf "\n" | $saveresult
 echo ------------11.10.5 securetty文件权限--------------------
 echo "[11.10.5]正在检查securetty文件权限....." | $saveresult
 securetty=$(ls -l /etc/securetty | awk '{print $1}')
-if [ "${securetty:1:9}" = "rw-------" ]; then
+if [ "${securetty:1:9}" = "-rw-------" ]; then
     echo "[*]/etc/securetty文件权限为600,符合规范" | $saveresult
 else
     echo "[!!!]/etc/securetty文件权限为""${securetty:1:9}","不符合规范,权限应改为600" | tee -a $danger_file | $saveresult
@@ -796,7 +794,7 @@ printf "\n" | $saveresult
 echo ------------11.10.6 services文件权限--------------------
 echo "[11.10.6]正在检查services文件权限....." | $saveresult
 services=$(ls -l /etc/services | awk '{print $1}')
-if [ "${services:1:9}" = "rw-r--r--" ]; then
+if [ "${services:1:9}" = "-rw-r--r--" ]; then
     echo "[*]/etc/services文件权限为644,符合规范" | $saveresult
 else
     echo "[!!!]/etc/services文件权限为""$services:1:9}","不符合规范,权限应改为644" | tee -a $danger_file | $saveresult
@@ -806,7 +804,7 @@ printf "\n" | $saveresult
 echo ------------11.10.7 grub.conf文件权限--------------------
 echo "[11.10.7]正在检查grub.conf文件权限....." | $saveresult
 grubconf=$(ls -l /etc/grub.conf | awk '{print $1}')
-if [ "${grubconf:1:9}" = "rw-------" ]; then
+if [ "${grubconf:1:9}" = "-rw-------" ]; then
     echo "[*]/etc/grub.conf文件权限为600,符合规范" | $saveresult
 else
     echo "[!!!]/etc/grub.conf文件权限为""${grubconf:1:9}","不符合规范,权限应改为600" | tee -a $danger_file | $saveresult
@@ -816,7 +814,7 @@ printf "\n" | $saveresult
 echo ------------11.10.8 xinetd.conf文件权限--------------------
 echo "[11.10.8]正在检查xinetd.conf文件权限....." | $saveresult
 xinetdconf=$(ls -l /etc/xinetd.conf | awk '{print $1}')
-if [ "${xinetdconf:1:9}" = "rw-------" ]; then
+if [ "${xinetdconf:1:9}" = "-rw-------" ]; then
     echo "[*]/etc/xinetd.conf文件权限为600,符合规范" | $saveresult
 else
     echo "[!!!]/etc/xinetd.conf文件权限为""${xinetdconf:1:9}","不符合规范,权限应改为600" | tee -a $danger_file | $saveresult
@@ -827,7 +825,7 @@ echo ------------11.10.9 lilo.conf文件权限--------------------
 echo "[11.10.9]正在检查lilo.conf文件权限....." | $saveresult
 if [ -f /etc/lilo.conf ];then
 liloconf=$(ls -l /etc/lilo.conf | awk '{print $1}')
-	if [ "${liloconf:1:9}" = "rw-------" ];then
+	if [ "${liloconf:1:9}" = "-rw-------" ];then
 		echo "/etc/lilo.conf文件权限为600,符合要求" | $saveresult
 	else
 		echo "/etc/lilo.conf文件权限不为600,不符合要求,建议设置权限为600" | $saveresult
